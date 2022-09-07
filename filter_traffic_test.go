@@ -2,7 +2,7 @@ package filter_traffic
 
 import "testing"
 
-func BenchmarkRepository_FilterTraffic(b *testing.B) {
+func BenchmarkRepository_FilterTraffic_WithMaps(b *testing.B) {
 	globalFilter := GlobalFilter[string]{
 		Limit: 50,
 		Counter: &Counter{
@@ -15,7 +15,7 @@ func BenchmarkRepository_FilterTraffic(b *testing.B) {
 		"DE": 50,
 	})
 
-	r := New[string](FilterTrafficConfig[string]{Enabled: true}, globalFilter, perValueFilter)
+	r := New(FilterTrafficConfig[string]{Enabled: true}, globalFilter, perValueFilter)
 
 	b.ResetTimer()
 

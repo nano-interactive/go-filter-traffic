@@ -9,43 +9,51 @@ type (
 		Enabled bool
 	}
 
-	FilterTraffic[T comparable] struct {
-		enabled bool
-		filters []PerValueFilter[T]
+	FilterTraffic[T comparable, TFilter PerValueFilter[T]] struct {
+		enabled      bool
+		globalFilter GlobalFilter[T]
+		filter       TFilter
 	}
 )
 
-var _ Filter = FilterTraffic[string]{}
+var _ Filter = FilterTraffic[string, GlobalFilter[string]]{}
 
-func New[T comparable](config FilterTrafficConfig[T], filters ...PerValueFilter[T]) FilterTraffic[T] {
-	return FilterTraffic[T]{
-		enabled: config.Enabled,
-		filters: filters,
+func New[T comparable, TFilter PerValueFilter[T]](config FilterTrafficConfig[T], globalFilter GlobalFilter[T], other TFilter) FilterTraffic[T, TFilter] {
+	return FilterTraffic[T, TFilter]{
+		enabled:      config.Enabled,
+		globalFilter: globalFilter,
+		filter:       other,
 	}
 }
 
-func (r FilterTraffic[T]) LetThrough(key T) bool {
+func (r FilterTraffic[T, TFilter]) LetThrough(key T) bool {
 	if !r.enabled {
 		return true
 	}
 
-	for _, filter := range r.filters {
-		if !filter.HasKey(key) {
-			continue
-		}
-
-		if filter.Reset(key) {
-			filter.Increment(key)
-			return true
-		}
-
-		limit := filter.GetLimit(key)
-		old := filter.Increment(key)
-
-		if old < limit {
-			return true
-		}
+	if r.globalFilter.Reset(key) {
+		r.globalFilter.Increment(key)
+		return true
 	}
 
-	return false
+	limit := r.globalFilter.GetLimit(key)
+	old := r.globalFilter.Increment(key)
+
+	if old < limit {
+		return true
+	}
+
+	if !r.filter.HasKey(key) {
+		return false
+	}
+
+	if r.filter.Reset(key) {
+		r.filter.Increment(key)
+		return true
+	}
+
+	limit = r.filter.GetLimit(key)
+	old = r.filter.Increment(key)
+
+	return old < limit
 }
