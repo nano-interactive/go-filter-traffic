@@ -10,9 +10,9 @@ type (
 	}
 
 	FilterTraffic[T comparable, TFilter PerValueFilter[T]] struct {
-		enabled      bool
 		globalFilter GlobalFilter[T]
 		filter       TFilter
+		enabled      bool
 	}
 )
 
@@ -31,13 +31,15 @@ func (r FilterTraffic[T, TFilter]) LetThrough(key T) bool {
 		return true
 	}
 
-	if r.globalFilter.Reset(key) {
-		r.globalFilter.Increment(key)
+	counter := r.globalFilter.Counter
+
+	if counter.counter.CompareAndSwap(100, 0) {
+		counter.counter.Add(1)
 		return true
 	}
 
-	limit := r.globalFilter.GetLimit(key)
-	old := r.globalFilter.Increment(key)
+	limit := r.globalFilter.Limit
+	old := r.globalFilter.Counter.counter.Add(1)
 
 	if old < limit {
 		return true
@@ -47,13 +49,15 @@ func (r FilterTraffic[T, TFilter]) LetThrough(key T) bool {
 		return false
 	}
 
-	if r.filter.Reset(key) {
-		r.filter.Increment(key)
+	counter = r.filter.GetCounter(key)
+
+	if counter.counter.CompareAndSwap(100, 0) {
+		counter.counter.Add(1)
 		return true
 	}
 
 	limit = r.filter.GetLimit(key)
-	old = r.filter.Increment(key)
+	old = counter.counter.Add(1)
 
 	return old < limit
 }
