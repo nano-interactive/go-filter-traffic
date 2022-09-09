@@ -10,9 +10,9 @@ type (
 	}
 
 	FilterTraffic[T comparable, TFilter PerValueFilter[T]] struct {
-		enabled      bool
 		globalFilter GlobalFilter[T]
 		filter       TFilter
+		enabled      bool
 	}
 )
 

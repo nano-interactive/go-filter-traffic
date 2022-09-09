@@ -30,6 +30,10 @@ var (
 )
 
 
+func (p GlobalFilter[T]) GetCounter(key T) *Counter {
+	return p.Counter
+}
+
 func NewPerValueFilterMap[T comparable](max uint64, limits map[T]uint64) PerValueFilterMap[T] {
 	counter := make(map[T]*Counter, len(limits))
 
@@ -43,11 +47,6 @@ func NewPerValueFilterMap[T comparable](max uint64, limits map[T]uint64) PerValu
 	}
 }
 
-
-
-func (g GlobalFilter[T]) GetCounter(key T) *Counter {
-	return g.Counter
-}
 
 
 func (g GlobalFilter[T]) GetLimit(key T) uint64 {
