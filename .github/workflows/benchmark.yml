@@ -1,5 +1,16 @@
 name: gobenchdata publish
-on: push
+
+on:
+  workflow_call:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
 jobs:
   publish:
     runs-on: ubuntu-latest
