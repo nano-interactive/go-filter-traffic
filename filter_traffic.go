@@ -2,7 +2,7 @@ package filter_traffic
 
 type (
 	Filter interface {
-		LetThrough(country string) bool
+		Do(country string) bool
 	}
 
 	FilterTrafficConfig[T comparable] struct {
@@ -26,34 +26,37 @@ func New[T comparable, TFilter PerValueFilter[T]](config FilterTrafficConfig[T],
 	}
 }
 
-func (r FilterTraffic[T, TFilter]) LetThrough(key T) bool {
+func (r FilterTraffic[T, TFilter]) Do(key T) bool {
 	if !r.enabled {
 		return true
 	}
 
-	if r.globalFilter.Reset(key) {
-		r.globalFilter.Increment(key)
-		return true
+	counter := r.globalFilter.Counter
+
+	if counter.counter.CompareAndSwap(counter.ResetNumber, 1) {
+		// This goto is used to avoid code duplication
+		// as we need to check if other filter rules should apply
+		// maybe to reset it or to check if it is still valid param
+		// passed in the argument ket<T>
+		goto checkOtherFilter
 	}
 
-	limit := r.globalFilter.GetLimit(key)
-	old := r.globalFilter.Increment(key)
-
-	if old < limit {
-		return true
-	}
-
-	if !r.filter.HasKey(key) {
+	if counter.counter.Add(1) > r.globalFilter.Limit {
 		return false
 	}
 
-	if r.filter.Reset(key) {
-		r.filter.Increment(key)
+checkOtherFilter:
+	counter = r.filter.GetCounter(key)
+
+	if counter == nil {
+		return false
+	}
+
+	if counter.counter.CompareAndSwap(counter.ResetNumber, 1) {
 		return true
 	}
 
-	limit = r.filter.GetLimit(key)
-	old = r.filter.Increment(key)
+	old := counter.counter.Add(1)
 
-	return old < limit
+	return old < r.filter.GetLimit(key)
 }
