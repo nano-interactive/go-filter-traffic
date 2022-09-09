@@ -18,8 +18,8 @@ func main() {
 	r := traffic.New(traffic.FilterTrafficConfig[string]{Enabled: true}, globalFilter, perValueFilter)
 
 	for i := 0; i < 1000_0000; i++ {
-		r.LetThrough("DE")
-		r.LetThrough("UK")
-		r.LetThrough("RS")
+		r.Do("DE")
+		r.Do("UK")
+		r.Do("RS")
 	}
 }

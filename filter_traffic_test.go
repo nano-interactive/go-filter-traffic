@@ -227,9 +227,9 @@ func BenchmarkRepository_FilterTraffic_WithStruct(b *testing.B) {
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			r.LetThrough("DE")
-			r.LetThrough("UK")
-			r.LetThrough("RS")
+			r.Do("DE")
+			r.Do("UK")
+			r.Do("RS")
 		}
 	})
 }
