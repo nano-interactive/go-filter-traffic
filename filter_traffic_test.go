@@ -215,8 +215,8 @@ func BenchmarkRepository_FilterTraffic_WithStruct(b *testing.B) {
 	}
 
 	perValueFilter := TestFilter{
-		UK: 10,
-		DE: 50,
+		UK:        10,
+		DE:        50,
 		uKCounter: &Counter{ResetNumber: 100},
 		dECounter: &Counter{ResetNumber: 100},
 	}
