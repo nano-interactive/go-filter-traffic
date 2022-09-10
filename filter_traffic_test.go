@@ -20,7 +20,7 @@ func TestFilterTraffic_SkipEverything_GlobalTraffic_Is_Zero(t *testing.T) {
 
 	perValueFilter := PerValueFilterMap[string]{}
 
-	r := New(FilterTrafficConfig[string]{Enabled: true}, globalFilter, perValueFilter)
+	r := New(FilterTrafficConfig{Enabled: true}, globalFilter, perValueFilter)
 
 	assert.Equal(false, r.Do("Test"))
 }
@@ -38,7 +38,7 @@ func TestFilterTraffic_PerValueFiller_Is_Zero(t *testing.T) {
 
 	perValueFilter := NewPerValueFilterMap(100, map[string]uint64{"DE": 0})
 
-	r := New(FilterTrafficConfig[string]{Enabled: true}, globalFilter, perValueFilter)
+	r := New(FilterTrafficConfig{Enabled: true}, globalFilter, perValueFilter)
 
 	assert.Equal(false, r.Do("Test")) // Fails as 'Test' is not found
 	assert.Equal(false, r.Do("DE"))   // Fails as 'DE' is found but limit is 0
@@ -62,7 +62,7 @@ func TestFilterTraffic_GlobalReset(t *testing.T) {
 
 	perValueFilter := NewPerValueFilterMap(100, map[string]uint64{"DE": 100})
 
-	r := New(FilterTrafficConfig[string]{Enabled: true}, globalFilter, perValueFilter)
+	r := New(FilterTrafficConfig{Enabled: true}, globalFilter, perValueFilter)
 
 	assert.Equal(false, r.Do("Test")) // Fails as 'Test' is not found
 	assert.Equal(true, r.Do("DE"))    // Passes as 'DE' is found and limit is 100
@@ -85,7 +85,7 @@ func TestFilterTraffic_PerValue_Reset(t *testing.T) {
 	perValueFilter := NewPerValueFilterMap(100, map[string]uint64{"DE": 1})
 	perValueFilter.counter["DE"].counter.Store(100)
 
-	r := New(FilterTrafficConfig[string]{Enabled: true}, globalFilter, perValueFilter)
+	r := New(FilterTrafficConfig{Enabled: true}, globalFilter, perValueFilter)
 
 	assert.Equal(false, r.Do("Test")) // Fails as 'Test' is not found
 	assert.Equal(true, r.Do("DE"))    // Passes as 'DE' is found and limit is 1 and counter is reset
@@ -104,7 +104,7 @@ func BenchmarkRepository_FilterTraffic_Disabled(b *testing.B) {
 		"DE": 50,
 	})
 
-	r := New(FilterTrafficConfig[string]{Enabled: false}, globalFilter, perValueFilter)
+	r := New(FilterTrafficConfig{Enabled: false}, globalFilter, perValueFilter)
 
 	b.ResetTimer()
 
@@ -130,7 +130,7 @@ func BenchmarkRepository_FilterTraffic_WithMaps_AllFound(b *testing.B) {
 		"DE": 50,
 	})
 
-	r := New(FilterTrafficConfig[string]{Enabled: true}, globalFilter, perValueFilter)
+	r := New(FilterTrafficConfig{Enabled: true}, globalFilter, perValueFilter)
 
 	b.ResetTimer()
 
@@ -154,7 +154,7 @@ func BenchmarkRepository_FilterTraffic_WithMaps_AllNotFoundFound(b *testing.B) {
 		"UK": 10,
 	})
 
-	r := New(FilterTrafficConfig[string]{Enabled: true}, globalFilter, perValueFilter)
+	r := New(FilterTrafficConfig{Enabled: true}, globalFilter, perValueFilter)
 
 	b.ResetTimer()
 
@@ -221,7 +221,7 @@ func BenchmarkRepository_FilterTraffic_WithStruct(b *testing.B) {
 		dECounter: &Counter{ResetNumber: 100},
 	}
 
-	r := New(FilterTrafficConfig[string]{Enabled: true}, globalFilter, perValueFilter)
+	r := New(FilterTrafficConfig{Enabled: true}, globalFilter, perValueFilter)
 
 	b.ResetTimer()
 

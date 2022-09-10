@@ -5,7 +5,7 @@ type (
 		Do(T) bool
 	}
 
-	FilterTrafficConfig[T comparable] struct {
+	FilterTrafficConfig struct {
 		Enabled bool
 	}
 
@@ -18,7 +18,7 @@ type (
 
 var _ Filter[string] = FilterTraffic[string, GlobalFilter[string]]{}
 
-func New[T comparable, TFilter PerValueFilter[T]](config FilterTrafficConfig[T], globalFilter GlobalFilter[T], other TFilter) FilterTraffic[T, TFilter] {
+func New[T comparable, TFilter PerValueFilter[T]](config FilterTrafficConfig, globalFilter GlobalFilter[T], other TFilter) FilterTraffic[T, TFilter] {
 	return FilterTraffic[T, TFilter]{
 		enabled:      config.Enabled,
 		globalFilter: globalFilter,
