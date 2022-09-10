@@ -1,8 +1,8 @@
 package filter_traffic
 
 type (
-	Filter interface {
-		Do(country string) bool
+	Filter[T comparable] interface {
+		Do(T) bool
 	}
 
 	FilterTrafficConfig[T comparable] struct {
@@ -16,7 +16,7 @@ type (
 	}
 )
 
-var _ Filter = FilterTraffic[string, GlobalFilter[string]]{}
+var _ Filter[string] = FilterTraffic[string, GlobalFilter[string]]{}
 
 func New[T comparable, TFilter PerValueFilter[T]](config FilterTrafficConfig[T], globalFilter GlobalFilter[T], other TFilter) FilterTraffic[T, TFilter] {
 	return FilterTraffic[T, TFilter]{
