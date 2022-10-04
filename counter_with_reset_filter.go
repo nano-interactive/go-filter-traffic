@@ -14,7 +14,7 @@ type (
 
 var _ Filter[string] = CounterWithResetFilter[string, GlobalFilter[string]]{}
 
-func NewCounterFilter[T comparable, TFilter PerValueFilter[T]](config PercentageFilterConfig, globalFilter GlobalFilter[T], other TFilter) CounterWithResetFilter[T, TFilter] {
+func NewCounterFilter[T comparable, TFilter PerValueFilter[T]](config CounterWithResetFilterConfig, globalFilter GlobalFilter[T], other TFilter) CounterWithResetFilter[T, TFilter] {
 	return CounterWithResetFilter[T, TFilter]{
 		enabled:      config.Enabled,
 		globalFilter: globalFilter,
