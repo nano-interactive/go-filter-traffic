@@ -15,7 +15,7 @@ func main() {
 		"DE": 50,
 	})
 
-	r := traffic.New(traffic.FilterTrafficConfig{Enabled: true}, globalFilter, perValueFilter)
+	r := traffic.NewCounterFilter(traffic.PercentageFilterConfig{Enabled: true}, globalFilter, perValueFilter)
 
 	for i := 0; i < 1000_0000; i++ {
 		r.Do("DE")

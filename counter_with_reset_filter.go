@@ -1,32 +1,28 @@
 package filter_traffic
 
 type (
-	Filter[T comparable] interface {
-		Do(T) bool
-	}
-
-	FilterTrafficConfig struct {
+	CounterWithResetFilterConfig struct {
 		Enabled bool
 	}
 
-	FilterTraffic[T comparable, TFilter PerValueFilter[T]] struct {
+	CounterWithResetFilter[T comparable, TFilter PerValueFilter[T]] struct {
 		globalFilter GlobalFilter[T]
 		filter       TFilter
 		enabled      bool
 	}
 )
 
-var _ Filter[string] = FilterTraffic[string, GlobalFilter[string]]{}
+var _ Filter[string] = CounterWithResetFilter[string, GlobalFilter[string]]{}
 
-func New[T comparable, TFilter PerValueFilter[T]](config FilterTrafficConfig, globalFilter GlobalFilter[T], other TFilter) FilterTraffic[T, TFilter] {
-	return FilterTraffic[T, TFilter]{
+func NewCounterFilter[T comparable, TFilter PerValueFilter[T]](config PercentageFilterConfig, globalFilter GlobalFilter[T], other TFilter) CounterWithResetFilter[T, TFilter] {
+	return CounterWithResetFilter[T, TFilter]{
 		enabled:      config.Enabled,
 		globalFilter: globalFilter,
 		filter:       other,
 	}
 }
 
-func (r FilterTraffic[T, TFilter]) Do(key T) bool {
+func (r CounterWithResetFilter[T, TFilter]) Do(key T) bool {
 	if !r.enabled {
 		return true
 	}
